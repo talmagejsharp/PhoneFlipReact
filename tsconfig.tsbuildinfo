@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/permissioncard.tsx","./src/components/resultcard.tsx","./src/components/unsupportedcard.tsx","./src/config/sensorconfig.ts","./src/lib/flipdetector.ts","./src/lib/skateboardtrickclassifier.ts","./src/types/sensortypes.ts"],"errors":true,"version":"5.9.3"}

@@ -35,7 +35,7 @@ function orientationMagnitude(alpha: number | null, beta: number | null, gamma: 
 }
 
 function isIosPermissionApiAvailable<T extends "DeviceMotionEvent" | "DeviceOrientationEvent">(key: T): boolean {
-  const source = (window as Window & Record<string, unknown>)[key] as {
+  const source = (window as unknown as Record<string, unknown>)[key] as {
     requestPermission?: () => Promise<"granted" | "denied">;
   } | undefined;
 
