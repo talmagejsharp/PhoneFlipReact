@@ -27,7 +27,9 @@ function extractMetrics(segment: SensorSegment) {
     const acc = sample.devicemotion?.accelerationIncludingGravity;
 
     if (rot) {
-      const { alpha = 0, beta = 0, gamma = 0 } = rot;
+      const alpha = rot.alpha ?? 0;
+      const beta = rot.beta ?? 0;
+      const gamma = rot.gamma ?? 0;
 
       maxBeta = Math.max(maxBeta, beta);
       minBeta = Math.min(minBeta, beta);
@@ -44,7 +46,8 @@ function extractMetrics(segment: SensorSegment) {
     }
 
     if (acc) {
-      const { y = 0, z = 0 } = acc;
+      const y = acc.y ?? 0;
+      const z = acc.z ?? 0;
 
       minAccelZ = Math.min(minAccelZ, z);
       minAccelY = Math.min(minAccelY, y);

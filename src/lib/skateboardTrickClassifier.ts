@@ -60,7 +60,7 @@ interface TrickProfile {
 }
 
 type RequiredMetrics = {
-  [K in keyof TrickMetrics]-?: number | undefined;
+  [K in keyof TrickMetrics]: number;
 };
 
 const EPS = 1e-9;
@@ -147,26 +147,26 @@ function getMetrics(input: SegmentLike): RequiredMetrics {
     : (input.metrics ?? input);
 
   const out: RequiredMetrics = {
-    maxBeta: isFiniteNumber(raw.maxBeta) ? raw.maxBeta : undefined,
-    minBeta: isFiniteNumber(raw.minBeta) ? raw.minBeta : undefined,
-    maxGamma: isFiniteNumber(raw.maxGamma) ? raw.maxGamma : undefined,
-    minGamma: isFiniteNumber(raw.minGamma) ? raw.minGamma : undefined,
-    maxAlpha: isFiniteNumber(raw.maxAlpha) ? raw.maxAlpha : undefined,
-    minAlpha: isFiniteNumber(raw.minAlpha) ? raw.minAlpha : undefined,
+    maxBeta: isFiniteNumber(raw.maxBeta) ? raw.maxBeta : 0,
+    minBeta: isFiniteNumber(raw.minBeta) ? raw.minBeta : 0,
+    maxGamma: isFiniteNumber(raw.maxGamma) ? raw.maxGamma : 0,
+    minGamma: isFiniteNumber(raw.minGamma) ? raw.minGamma : 0,
+    maxAlpha: isFiniteNumber(raw.maxAlpha) ? raw.maxAlpha : 0,
+    minAlpha: isFiniteNumber(raw.minAlpha) ? raw.minAlpha : 0,
 
-    peakAbsBeta: isFiniteNumber(raw.peakAbsBeta) ? raw.peakAbsBeta : undefined,
-    peakAbsGamma: isFiniteNumber(raw.peakAbsGamma) ? raw.peakAbsGamma : undefined,
-    peakAbsAlpha: isFiniteNumber(raw.peakAbsAlpha) ? raw.peakAbsAlpha : undefined,
+    peakAbsBeta: isFiniteNumber(raw.peakAbsBeta) ? raw.peakAbsBeta : 0,
+    peakAbsGamma: isFiniteNumber(raw.peakAbsGamma) ? raw.peakAbsGamma : 0,
+    peakAbsAlpha: isFiniteNumber(raw.peakAbsAlpha) ? raw.peakAbsAlpha : 0,
 
-    betaAsymmetry: isFiniteNumber(raw.betaAsymmetry) ? raw.betaAsymmetry : undefined,
-    gammaAsymmetry: isFiniteNumber(raw.gammaAsymmetry) ? raw.gammaAsymmetry : undefined,
+    betaAsymmetry: isFiniteNumber(raw.betaAsymmetry) ? raw.betaAsymmetry : 0,
+    gammaAsymmetry: isFiniteNumber(raw.gammaAsymmetry) ? raw.gammaAsymmetry : 0,
 
-    minAccelZ: isFiniteNumber(raw.minAccelZ) ? raw.minAccelZ : undefined,
-    minAccelY: isFiniteNumber(raw.minAccelY) ? raw.minAccelY : undefined,
-    maxAccelY: isFiniteNumber(raw.maxAccelY) ? raw.maxAccelY : undefined,
+    minAccelZ: isFiniteNumber(raw.minAccelZ) ? raw.minAccelZ : 0,
+    minAccelY: isFiniteNumber(raw.minAccelY) ? raw.minAccelY : 0,
+    maxAccelY: isFiniteNumber(raw.maxAccelY) ? raw.maxAccelY : 0,
 
-    durationMs: isFiniteNumber(raw.durationMs) ? raw.durationMs : undefined,
-    motionCount: isFiniteNumber(raw.motionCount) ? raw.motionCount : undefined
+    durationMs: isFiniteNumber(raw.durationMs) ? raw.durationMs : 0,
+    motionCount: isFiniteNumber(raw.motionCount) ? raw.motionCount : 0
   };
 
   return out;
