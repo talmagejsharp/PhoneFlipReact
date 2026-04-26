@@ -82,6 +82,9 @@ function extractMetrics(segment: SensorSegment) {
     betaAsymmetry,
     gammaAsymmetry,
 
+    netBeta: safe(maxBeta) + safe(minBeta),
+    netGamma: safe(maxGamma) + safe(minGamma),
+
     minAccelZ: safe(minAccelZ),
     minAccelY: safe(minAccelY),
     maxAccelY: safe(maxAccelY),

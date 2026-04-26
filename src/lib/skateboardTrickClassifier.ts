@@ -24,6 +24,9 @@ export interface TrickMetrics {
   betaAsymmetry?: number;
   gammaAsymmetry?: number;
 
+  netBeta?: number;
+  netGamma?: number;
+
   minAccelZ?: number;
   minAccelY?: number;
   maxAccelY?: number;
@@ -60,7 +63,7 @@ interface TrickProfile {
 }
 
 type RequiredMetrics = {
-  [K in keyof TrickMetrics]: number;
+  [K in keyof Required<TrickMetrics>]: number;
 };
 
 const EPS = 1e-9;
@@ -161,6 +164,9 @@ function getMetrics(input: SegmentLike): RequiredMetrics {
     betaAsymmetry: isFiniteNumber(raw.betaAsymmetry) ? raw.betaAsymmetry : 0,
     gammaAsymmetry: isFiniteNumber(raw.gammaAsymmetry) ? raw.gammaAsymmetry : 0,
 
+    netBeta: isFiniteNumber(raw.netBeta) ? raw.netBeta : 0,
+    netGamma: isFiniteNumber(raw.netGamma) ? raw.netGamma : 0,
+
     minAccelZ: isFiniteNumber(raw.minAccelZ) ? raw.minAccelZ : 0,
     minAccelY: isFiniteNumber(raw.minAccelY) ? raw.minAccelY : 0,
     maxAccelY: isFiniteNumber(raw.maxAccelY) ? raw.maxAccelY : 0,
@@ -241,29 +247,29 @@ function buildProfiles(): TrickProfile[] {
       name: "kickFlip",
       rules: [
         (m) => ({
+          label: "net beta strongly forward",
+          weight: 3.0,
+          score: scoreAtLeast(m.netBeta, 1000)
+        }),
+        (m) => ({
           label: "dominant beta axis",
           weight: 2.0,
           score: dominanceScore(m, "beta", 1.12)
         }),
         (m) => ({
-          label: "strong positive maxBeta",
-          weight: 2.4,
-          score: scoreInterval(m.maxBeta, 1400, 2100)
+          label: "maxBeta in range",
+          weight: 2.0,
+          score: scoreInterval(m.maxBeta, 1300, 2200)
         }),
         (m) => ({
-          label: "mild negative minBeta",
-          weight: 1.4,
-          score: scoreInterval(m.minBeta, -550, -150)
+          label: "gamma very low",
+          weight: 2.5,
+          score: scoreAtMost(m.peakAbsGamma, 400)
         }),
         (m) => ({
-          label: "beta asymmetry above 1",
-          weight: 1.6,
-          score: scoreAtLeast(m.betaAsymmetry, 1.8)
-        }),
-        (m) => ({
-          label: "gamma stays lower",
-          weight: 1.2,
-          score: scoreAtMost(m.peakAbsGamma, 720)
+          label: "minGamma not strongly negative",
+          weight: 1.5,
+          score: scoreInterval(m.minGamma, -280, 0)
         }),
         (m) => ({
           label: "alpha is secondary",
@@ -277,34 +283,39 @@ function buildProfiles(): TrickProfile[] {
       name: "heelFlip",
       rules: [
         (m) => ({
+          label: "net beta strongly backward",
+          weight: 3.0,
+          score: scoreAtMost(m.netBeta, -350)
+        }),
+        (m) => ({
           label: "dominant beta axis",
           weight: 2.0,
           score: dominanceScore(m, "beta", 1.10)
         }),
         (m) => ({
-          label: "strong negative minBeta",
+          label: "minBeta in range",
           weight: 2.5,
-          score: scoreInterval(m.minBeta, -1350, -1060)
+          score: scoreInterval(m.minBeta, -1400, -1000)
         }),
         (m) => ({
-          label: "limited positive maxBeta",
-          weight: 1.2,
-          score: scoreAtMost(m.maxBeta, 450)
+          label: "maxBeta limited",
+          weight: 1.5,
+          score: scoreAtMost(m.maxBeta, 1000)
         }),
         (m) => ({
-          label: "beta asymmetry below 1",
-          weight: 1.8,
-          score: scoreAtMost(m.betaAsymmetry, 0.65)
+          label: "gamma low",
+          weight: 2.0,
+          score: scoreAtMost(m.peakAbsGamma, 500)
         }),
         (m) => ({
-          label: "gamma is moderate",
-          weight: 1.0,
-          score: scoreAtMost(m.peakAbsGamma, 780)
+          label: "net gamma not positive",
+          weight: 1.5,
+          score: scoreAtMost(m.netGamma, 150)
         }),
         (m) => ({
           label: "alpha is secondary",
           weight: 0.8,
-          score: scoreAtMost(m.peakAbsAlpha, 700)
+          score: scoreAtMost(m.peakAbsAlpha, 450)
         })
       ]
     },
@@ -313,34 +324,34 @@ function buildProfiles(): TrickProfile[] {
       name: "threeSixty",
       rules: [
         (m) => ({
-          label: "dominant gamma axis",
-          weight: 2.5,
-          score: dominanceScore(m, "gamma", 1.05)
+          label: "net gamma strongly negative",
+          weight: 3.0,
+          score: scoreAtMost(m.netGamma, -550)
         }),
         (m) => ({
-          label: "large negative gamma",
-          weight: 2.8,
-          score: scoreAtLeast(m.minGamma, -1100)
+          label: "minGamma strongly negative",
+          weight: 2.5,
+          score: scoreAtMost(m.minGamma, -700)
         }),
         (m) => ({
           label: "strong gamma magnitude",
           weight: 2.0,
-          score: scoreAtLeast(m.peakAbsGamma, 650)
+          score: scoreAtLeast(m.peakAbsGamma, 750)
+        }),
+        (m) => ({
+          label: "dominant gamma axis",
+          weight: 2.0,
+          score: dominanceScore(m, "gamma", 1.05)
         }),
         (m) => ({
           label: "high alpha involvement",
-          weight: 1.8,
+          weight: 1.5,
           score: scoreAtLeast(m.peakAbsAlpha, 400)
         }),
         (m) => ({
-          label: "beta is active but not dominant",
+          label: "beta not extreme",
           weight: 1.0,
-          score: scoreAtMost(m.peakAbsBeta, 1200)
-        }),
-        (m) => ({
-          label: "gamma asymmetry is not strongly positive",
-          weight: 0.8,
-          score: scoreAtMost(m.gammaAsymmetry, 3.0)
+          score: scoreAtMost(m.peakAbsBeta, 1500)
         })
       ]
     },
@@ -349,39 +360,39 @@ function buildProfiles(): TrickProfile[] {
       name: "reverseThreeSixty",
       rules: [
         (m) => ({
+          label: "maxGamma in range",
+          weight: 3.0,
+          score: scoreInterval(m.maxGamma, 840, 1100)
+        }),
+        (m) => ({
+          label: "net gamma strongly positive",
+          weight: 2.5,
+          score: scoreAtLeast(m.netGamma, 650)
+        }),
+        (m) => ({
           label: "dominant gamma axis",
           weight: 2.3,
           score: dominanceScore(m, "gamma", 1.08)
         }),
         (m) => ({
-          label: "strong positive maxGamma",
-          weight: 2.7,
-          score: scoreInterval(m.maxGamma, 848, 1086)
-        }),
-        (m) => ({
-          label: "small negative minGamma",
-          weight: 2.2,
-          score: scoreInterval(m.minGamma, -147, -49)
-        }),
-        (m) => ({
-          label: "very large gamma asymmetry",
+          label: "minGamma small negative",
           weight: 2.0,
-          score: scoreAtLeast(m.gammaAsymmetry, 5.0)
+          score: scoreInterval(m.minGamma, -150, -40)
         }),
         (m) => ({
-          label: "gamma dominates peak magnitude",
+          label: "gamma magnitude high",
           weight: 1.6,
           score: scoreAtLeast(m.peakAbsGamma, 760)
         }),
         (m) => ({
           label: "alpha is secondary",
           weight: 0.9,
-          score: scoreAtMost(m.peakAbsAlpha, 720)
+          score: scoreAtMost(m.peakAbsAlpha, 760)
         }),
         (m) => ({
           label: "beta is secondary",
           weight: 0.8,
-          score: scoreAtMost(m.peakAbsBeta, 850)
+          score: scoreAtMost(m.peakAbsBeta, 900)
         })
       ]
     }
